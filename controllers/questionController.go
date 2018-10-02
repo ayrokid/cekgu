@@ -7,11 +7,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (idb *InDB) GetTest(c *gin.Context) {
-	var test models.Test
+func (idb *InDB) GetQuestion(c *gin.Context) {
+	var question models.Question
 	var response gin.H
 	id := c.Param("id")
-	err := idb.DB.Where("id = ?", id).First(&test).Error
+	err := idb.DB.Where("id = ?", id).First(&question).Error
 	if err != nil {
 		response = gin.H{
 			"message": err.Error(),
@@ -20,7 +20,7 @@ func (idb *InDB) GetTest(c *gin.Context) {
 	} else {
 		response = gin.H{
 			"message": "data found",
-			"data":    test,
+			"data":    question,
 			"status":  true,
 		}
 	}
@@ -28,14 +28,14 @@ func (idb *InDB) GetTest(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-func (idb *InDB) AllTest(c *gin.Context) {
+func (idb *InDB) AllQuestion(c *gin.Context) {
 	var (
-		tests    []models.Test
-		response gin.H
+		questions []models.Question
+		response  gin.H
 	)
 
-	idb.DB.Find(&tests)
-	if len(tests) <= 0 {
+	idb.DB.Find(&questions)
+	if len(questions) <= 0 {
 		response = gin.H{
 			"message": "data not found",
 			"data":    nil,
@@ -44,7 +44,7 @@ func (idb *InDB) AllTest(c *gin.Context) {
 	} else {
 		response = gin.H{
 			"message": "data found",
-			"data":    tests,
+			"data":    questions,
 			"status":  true,
 		}
 	}
@@ -52,20 +52,20 @@ func (idb *InDB) AllTest(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-func (idb *InDB) CreateTest(c *gin.Context) {
+func (idb *InDB) CreateQuestion(c *gin.Context) {
 	var (
-		test     models.Test
+		question models.Question
 		response gin.H
 	)
 
-	err := c.ShouldBindJSON(&test)
+	err := c.ShouldBindJSON(&question)
 	if err != nil {
 		response = gin.H{
 			"message": err.Error(),
 			"status":  false,
 		}
 	} else {
-		err = idb.DB.Create(&test).Error
+		err = idb.DB.Create(&question).Error
 		if err != nil {
 			response = gin.H{
 				"message": "insert failed",
@@ -83,15 +83,15 @@ func (idb *InDB) CreateTest(c *gin.Context) {
 
 }
 
-func (idb *InDB) UpdateTest(c *gin.Context) {
+func (idb *InDB) UpdateQuestion(c *gin.Context) {
 	id := c.Query("id")
 	var (
-		test     models.Test
-		newTest  models.Test
-		response gin.H
+		question    models.Question
+		newQuestion models.Question
+		response    gin.H
 	)
 
-	err := idb.DB.First(&test, id).Error
+	err := idb.DB.First(&question, id).Error
 	if err != nil {
 		response = gin.H{
 			"message": "data not found",
@@ -99,7 +99,7 @@ func (idb *InDB) UpdateTest(c *gin.Context) {
 		}
 	}
 
-	err = c.ShouldBindJSON(&newTest)
+	err = c.ShouldBindJSON(&newQuestion)
 	if err != nil {
 		response = gin.H{
 			"message": err.Error(),
@@ -107,7 +107,7 @@ func (idb *InDB) UpdateTest(c *gin.Context) {
 		}
 	}
 
-	err = idb.DB.Model(&test).Update(newTest).Error
+	err = idb.DB.Model(&question).Update(newQuestion).Error
 	if err != nil {
 		response = gin.H{
 			"message": err.Error(),
@@ -123,20 +123,20 @@ func (idb *InDB) UpdateTest(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-func (idb *InDB) DeleteTest(c *gin.Context) {
+func (idb *InDB) DeleteQuestion(c *gin.Context) {
 	var (
-		test     models.Test
+		question models.Question
 		response gin.H
 	)
 	id := c.Param("id")
-	err := idb.DB.First(&test, id).Error
+	err := idb.DB.First(&question, id).Error
 	if err != nil {
 		response = gin.H{
 			"message": "data not found",
 			"status":  false,
 		}
 	} else {
-		err = idb.DB.Delete(&test).Error
+		err = idb.DB.Delete(&question).Error
 		if err != nil {
 			response = gin.H{
 				"message": "delete failed",

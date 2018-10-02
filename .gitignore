@@ -1,0 +1,18 @@
+# OS generated files #
+.DS_Store
+Thumbs.db
+
+# IDEA generated files #
+.vscode/
+.idea/
+*.swp
+.awcache
+
+# Go generated files #
+tmp/
+.env
+debug
+
+# Logs #
+*.log
+*.log*
