@@ -19,5 +19,9 @@ func DBInit() *gorm.DB {
 	}
 
 	db.AutoMigrate(models.Test{})
+	db.AutoMigrate(models.Question{})
+	db.AutoMigrate(models.QuestionChoice{})
+	db.AutoMigrate(models.Choice{})
+	db.AutoMigrate(models.User{})
 	return db
 }

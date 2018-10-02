@@ -38,6 +38,9 @@ func main() {
 		v1.POST("/question", auth, inDB.CreateQuestion)
 		v1.PUT("/question/:id", auth, inDB.UpdateQuestion)
 		v1.DELETE("/question/:id", auth, inDB.DeleteQuestion)
+
+		v1.GET("/question-choice/:id", inDB.GetQuestionChoice)
+		v1.GET("/question-choices", inDB.AllQuestionChoice)
 	}
 
 	router.Run(":" + os.Getenv("APP_PORT"))
