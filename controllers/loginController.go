@@ -22,7 +22,7 @@ func (idb *InDB) LoginHandler(c *gin.Context) {
 		})
 	}
 
-	if user.Username != "myname" {
+	if user.Username != "admin" {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"status":  http.StatusUnauthorized,
 			"message": "wrong username",

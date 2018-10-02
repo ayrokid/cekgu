@@ -24,7 +24,6 @@ func main() {
 	router := gin.Default()
 
 	router.POST("/login", inDB.LoginHandler)
-
 	v1 := router.Group("v1")
 	{
 		v1.GET("/test/:id", auth, inDB.GetTest)
@@ -39,9 +38,15 @@ func main() {
 		v1.PUT("/question/:id", auth, inDB.UpdateQuestion)
 		v1.DELETE("/question/:id", auth, inDB.DeleteQuestion)
 
-		v1.GET("/question-choice/:id", inDB.GetQuestionChoice)
-		v1.GET("/question-choices", inDB.AllQuestionChoice)
+		v1.GET("/choice/:id", inDB.GetChoice)
 	}
+
+	router.POST("/start", inDB.StartHandler)
+	tryout := router.Group("tryout")
+	{
+		tryout.POST("/start", inDB.ExamHandler)
+	}
+	tryout.Use(middlewares.Private())
 
 	router.Run(":" + os.Getenv("APP_PORT"))
 }
