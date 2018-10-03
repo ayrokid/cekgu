@@ -41,12 +41,10 @@ func main() {
 		v1.GET("/choice/:id", inDB.GetChoice)
 	}
 
-	router.POST("/start", inDB.StartHandler)
 	tryout := router.Group("tryout")
 	{
-		tryout.POST("/start", inDB.ExamHandler)
+		tryout.POST("/start", auth, inDB.StartHandler)
 	}
-	tryout.Use(middlewares.Private())
 
 	router.Run(":" + os.Getenv("APP_PORT"))
 }

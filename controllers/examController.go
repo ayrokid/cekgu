@@ -4,44 +4,16 @@ import (
 	"cekgu/models"
 	"net/http"
 
-	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
-	"golang.org/x/crypto/bcrypt"
 )
 
 func (idb *InDB) StartHandler(c *gin.Context) {
-	var (
-		user     models.User
-		response gin.H
-	)
+	// ext := middlewares.ExtractClaims
+	c.JSON(http.StatusOK, gin.H{
+		"message": "mulai gan",
+		// "ext":     string(ext),
+	})
 
-	err := c.ShouldBindJSON(&user)
-	if err != nil {
-		response = gin.H{
-			"message": err.Error(),
-			"status":  false,
-		}
-		c.JSON(http.StatusUnauthorized, response)
-	}
-
-	email := user.Email
-	password := []byte(user.Password)
-	hashedPassword, err := bcrypt.GenerateFromPassword(password, bcrypt.DefaultCost)
-	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication failed"})
-	}
-
-	err = bcrypt.CompareHashAndPassword(hashedPassword, password)
-	if err == nil {
-		session := sessions.Default(c)
-		session.Set("user", email)
-		err := session.Save()
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate session token"})
-		} else {
-			c.JSON(http.StatusOK, gin.H{"message": "Successfully authenticated user"})
-		}
-	}
 }
 
 func (idb *InDB) ExamHandler(c *gin.Context) {
