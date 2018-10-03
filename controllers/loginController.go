@@ -3,6 +3,7 @@ package controllers
 import (
 	"cekgu/models"
 	"net/http"
+	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
@@ -45,7 +46,10 @@ func (idb *InDB) LoginHandler(c *gin.Context) {
 
 	sign := jwt.New(jwt.GetSigningMethod("HS256"))
 	claims := sign.Claims.(jwt.MapClaims)
-	claims["email"] = student.Email
+	claims["id"] = student.ID
+	claims["role"] = student.Role
+	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
+	sign.Claims = claims
 	token, err := sign.SignedString([]byte("secret"))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{

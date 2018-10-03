@@ -18,6 +18,15 @@ func main() {
 		logrus.Fatal("Error loading .env file")
 	}
 
+	port := os.Getenv("APP_PORT")
+	r := gin.New()
+	r.Use(gin.Logger())
+	r.Use(gin.Recovery())
+
+	if port == "" {
+		port = "8000"
+	}
+
 	db := config.DBInit()
 	inDB := &controllers.InDB{DB: db}
 	auth := middlewares.Auth
@@ -46,5 +55,5 @@ func main() {
 		tryout.POST("/start", auth, inDB.StartHandler)
 	}
 
-	router.Run(":" + os.Getenv("APP_PORT"))
+	router.Run(":" + port)
 }

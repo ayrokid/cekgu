@@ -2,7 +2,6 @@ package middlewares
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
 	jwt "github.com/dgrijalva/jwt-go"
@@ -28,26 +27,20 @@ func Auth(c *gin.Context) {
 		c.Abort()
 	}
 
-	fmt.Println("token verfied")
-}
-
-func ExtractClaims(c *gin.Context) (jwt.MapClaims, bool) {
-	tokenString := c.Request.Header.Get("token")
-	hmacSecretString := "secret" // Value
-	hmacSecret := []byte(hmacSecretString)
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		// check token signing method etc
-		return hmacSecret, nil
-	})
-
-	if err != nil {
-		return nil, false
-	}
-
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		return claims, true
-	} else {
-		log.Printf("Invalid JWT Token")
-		return nil, false
+	if token.Valid {
+		c.Set("UserID", int64(token.Claims.(jwt.MapClaims)["id"].(float64)))
+		c.Set("Role", token.Claims.(jwt.MapClaims)["role"])
+		c.Set("AuthToken", token)
+		c.Next()
 	}
 }
+
+// func GetRole() {
+// 	return func(c *gin.Context) {
+// 		role, err := c.Get("Role")
+// 		if !err {
+// 			return
+// 		}
+// 		return role
+// 	}
+// }

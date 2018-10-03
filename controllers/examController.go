@@ -8,10 +8,16 @@ import (
 )
 
 func (idb *InDB) StartHandler(c *gin.Context) {
-	// ext := middlewares.ExtractClaims
+	userId, err := c.Get("UserID")
+	if !err {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": err,
+		})
+		return
+	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "mulai gan",
-		// "ext":     string(ext),
+		"id":      userId,
 	})
 
 }
