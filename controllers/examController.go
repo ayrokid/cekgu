@@ -69,6 +69,7 @@ func (idb *InDB) ExamHandler(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": error.Error(),
 			"status":  false,
+			"exam":    false,
 		})
 		return
 	}
@@ -94,17 +95,28 @@ func (idb *InDB) ExamHandler(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": error.Error(),
 			"status":  false,
+			"limit":   false,
 		})
 		return
 	}
 
 	choice := models.Choice{}
-	qc := models.QuestionChoice{}
+	// qc := models.QuestionChoice{}
 	dataList := []models.QuestionChoice{}
 	for _, element := range dataQuest {
 		_ = idb.DB.Where("question_id = ? ", element.ID).Find(&choice).Error
-		qc.QuestionId = element.ID
-		qc.Content = element.Content
-		qc.DataChoice = choice
+		qc := models.QuestionChoice{
+			QuestionId: element.ID,
+			Content:    element.Content,
+			DataChoice: choice,
+		}
+
+		dataList = append(dataList, qc)
 	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "successfully",
+		"status":  true,
+		"data":    dataList,
+	})
 }

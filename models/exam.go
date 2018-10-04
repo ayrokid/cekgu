@@ -12,7 +12,7 @@ type Exam struct {
 	TestId     int       `json:"test_id"`
 	StartDate  time.Time `json:"start_date"`
 	FinishDate time.Time `json:"finish_date"`
-	Duration   time.Time `json:"duration"`
+	Duration   int       `json:"duration"`
 	Score      int       `json:"score"`
 	Status     string    `json:"status"`
 }

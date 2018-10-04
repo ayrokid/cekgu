@@ -6,7 +6,7 @@ import (
 
 type QuestionChoice struct {
 	gorm.Model
-	QuestionId int    `json:"id"`
+	QuestionId uint   `json:"id"`
 	Content    string `json:"content"`
-	DataChoice []Choice
+	DataChoice Choice
 }
