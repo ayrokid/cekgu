@@ -56,6 +56,7 @@ func main() {
 		tryout.GET("/exam/:id/:limit", auth, inDB.ExamHandler)
 		tryout.POST("/answer/:id", auth, inDB.AnswerHandler)
 		tryout.GET("/finish/:id", auth, inDB.FinishHandler)
+		tryout.GET("/ranking/:id", auth, inDB.RankingHandler)
 	}
 
 	router.Run(":" + port)

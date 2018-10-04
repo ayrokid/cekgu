@@ -47,7 +47,7 @@ func (idb *InDB) ExamHandler(c *gin.Context) {
 
 	userId, _ := c.Get("UserID")
 
-	error := idb.DB.Where("user_id = ? AND test_id = ? ", userId, testId).First(&exam).Error
+	error := idb.DB.Where("user_id = ? AND test_id = ? ", userId, testId).Select("finish_date").First(&exam).Error
 	if error != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": error.Error(),
@@ -73,7 +73,7 @@ func (idb *InDB) ExamHandler(c *gin.Context) {
 	 * Tampilan soal sebanyak 5
 	 */
 	dataQuest := []models.Question{}
-	error = idb.DB.Limit(limit).Offset(offset).Where("test_id = ?", testId).Find(&dataQuest).Error
+	error = idb.DB.Limit(limit).Offset(offset).Where("test_id = ?", testId).Select("id, content").Find(&dataQuest).Error
 	if error != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": error.Error(),
@@ -87,7 +87,7 @@ func (idb *InDB) ExamHandler(c *gin.Context) {
 	// qc := models.QuestionChoice{}
 	dataList := []models.QuestionChoice{}
 	for _, element := range dataQuest {
-		_ = idb.DB.Where("question_id = ? ", element.ID).Find(&choice).Error
+		_ = idb.DB.Where("question_id = ? ", element.ID).Select("id, choice").Find(&choice).Error
 		qc := models.QuestionChoice{
 			QuestionId: element.ID,
 			Content:    element.Content,
@@ -111,7 +111,7 @@ func (idb *InDB) AnswerHandler(c *gin.Context) {
 	testId := c.Param("id")
 	userId, _ := c.Get("UserID")
 
-	error := idb.DB.Where("user_id = ? AND test_id = ? ", userId, testId).First(&exam).Error
+	error := idb.DB.Where("user_id = ? AND test_id = ? ", userId, testId).Select("finish_date").First(&exam).Error
 	if error != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": error.Error(),
@@ -163,7 +163,7 @@ func (idb *InDB) FinishHandler(c *gin.Context) {
 	testId := c.Param("id")
 	userId, _ := c.Get("UserID")
 
-	error := idb.DB.Where("user_id = ? AND test_id = ? ", userId, testId).First(&exam).Error
+	error := idb.DB.Where("user_id = ? AND test_id = ? ", userId, testId).Select("finish_date").First(&exam).Error
 	if error != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": error.Error(),
@@ -195,7 +195,7 @@ func (idb *InDB) FinishHandler(c *gin.Context) {
 	)
 	question := models.Question{}
 	listAnswer := []models.Answer{}
-	error = idb.DB.Where("user_id = ? AND test_id = ? ", userId, testId).Find(&listAnswer).Error
+	error = idb.DB.Where("user_id = ? AND test_id = ? ", userId, testId).Select("id, response").Find(&listAnswer).Error
 	if error != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": error.Error(),
@@ -205,13 +205,8 @@ func (idb *InDB) FinishHandler(c *gin.Context) {
 		return
 	}
 
-	// c.JSON(http.StatusUnauthorized, gin.H{
-	// 	"status": true,
-	// 	"answer": listAnswer,
-	// })
-
 	for _, answer := range listAnswer {
-		_ = idb.DB.Where("question_id = ? ", answer.QuestionId).Find(&question).Error
+		_ = idb.DB.Where("question_id = ? ", answer.QuestionId).Select("answer").Find(&question).Error
 		if answer.Response == question.Answer {
 			correct += 1
 		} else if answer.Response != question.Answer {
@@ -235,9 +230,9 @@ func (idb *InDB) FinishHandler(c *gin.Context) {
 		Score:             score,
 		PercentageCorrect: percenCorrect,
 		PercentageWrong:   percenWrong,
-		// FinishDate:        time.Now(),
-		Duration: duration.Minutes(),
-		Status:   "completed",
+		FinishDate:        time.Now(),
+		Duration:          duration.Minutes(),
+		Status:            "completed",
 	}
 
 	error = idb.DB.Model(&exam).Update(newExam).Error
@@ -253,7 +248,7 @@ func (idb *InDB) FinishHandler(c *gin.Context) {
 	 * Get rangking
 	 */
 	listExam := []models.Exam{}
-	error = idb.DB.Where("test_id = ? ", testId).Order("Score desc").Find(&listExam).Error
+	error = idb.DB.Where("test_id = ? ", testId).Order("Score desc").Select("user_id, score").Find(&listExam).Error
 	if error != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": error.Error(),
@@ -273,5 +268,25 @@ func (idb *InDB) FinishHandler(c *gin.Context) {
 		"message":  "succesfully",
 		"status":   true,
 		"position": position,
+	})
+}
+
+func (idb *InDB) RankingHandler(c *gin.Context) {
+	testId := c.Param("id")
+
+	rangking := []models.Ranking{}
+	error := idb.DB.Table("exams").Where("test_id = ? ", testId).Joins("left join users on users.id=exams.user_id").Order("Score desc").Select("score, name").Find(&rangking).Error
+	if error != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": error.Error(),
+			"status":  false,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":  "succesfully",
+		"status":   true,
+		"position": rangking,
 	})
 }

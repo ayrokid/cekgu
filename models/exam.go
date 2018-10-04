@@ -18,6 +18,6 @@ type Exam struct {
 	PercentageCorrect float64   `json:"percentage_correct"`
 	PercentageWrong   float64   `json:"percentage_wrong"`
 	NotAnswered       int       `json:"not_answered"`
-	RightAnswer       int
-	WrongAnswer       int
+	RightAnswer       int       `json:"right_answer"`
+	WrongAnswer       int       `json:"wrong_answer"`
 }
