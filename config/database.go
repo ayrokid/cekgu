@@ -1,7 +1,6 @@
 package config
 
 import (
-	"cekgu/models"
 	"os"
 
 	"github.com/jinzhu/gorm"
@@ -18,10 +17,11 @@ func DBInit() *gorm.DB {
 		panic("failed to connect to database")
 	}
 
-	db.AutoMigrate(models.Test{})
-	db.AutoMigrate(models.Question{})
-	db.AutoMigrate(models.Choice{})
-	db.AutoMigrate(models.User{})
-	db.AutoMigrate(models.Exam{})
+	// db.AutoMigrate(models.Test{})
+	// db.AutoMigrate(models.Question{})
+	// db.AutoMigrate(models.Choice{})
+	// db.AutoMigrate(models.User{})
+	// db.AutoMigrate(models.Exam{})
+	// db.AutoMigrate(models.Answer{})
 	return db
 }

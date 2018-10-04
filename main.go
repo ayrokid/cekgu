@@ -52,8 +52,10 @@ func main() {
 
 	tryout := router.Group("tryout")
 	{
-		tryout.POST("/start/:id", auth, inDB.StartHandler)
-		tryout.POST("/exam/:id", auth, inDB.ExamHandler)
+		tryout.GET("/start/:id", auth, inDB.StartHandler)
+		tryout.GET("/exam/:id/:limit", auth, inDB.ExamHandler)
+		tryout.POST("/answer/:id", auth, inDB.AnswerHandler)
+		tryout.GET("/finish/:id", auth, inDB.FinishHandler)
 	}
 
 	router.Run(":" + port)

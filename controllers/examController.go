@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"cekgu/models"
+	"math"
 	"net/http"
 	"strconv"
 	"time"
@@ -10,24 +11,8 @@ import (
 )
 
 func (idb *InDB) StartHandler(c *gin.Context) {
-	testId, er := strconv.Atoi(c.Param("id"))
-	if er != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"message": er,
-			"status":  false,
-			"id":      testId,
-		})
-		return
-	}
-	userId, err := c.Get("UserID")
-	if !err {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"message": err,
-			"status":  false,
-			"userId":  userId,
-		})
-		return
-	}
+	testId, _ := strconv.Atoi(c.Param("id"))
+	userId, _ := c.Get("UserID")
 
 	exam := models.Exam{
 		UserId:     userId.(int64),
@@ -54,15 +39,13 @@ func (idb *InDB) ExamHandler(c *gin.Context) {
 	if limit <= 0 {
 		limit = 5
 	}
-	userId, err := c.Get("UserID")
-	if !err {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"message": err,
-			"status":  false,
-			"userId":  userId,
-		})
-		return
+	page, _ := strconv.Atoi(c.Query("page"))
+	offset := page * limit
+	if page <= 0 {
+		offset = 0
 	}
+
+	userId, _ := c.Get("UserID")
 
 	error := idb.DB.Where("user_id = ? AND test_id = ? ", userId, testId).First(&exam).Error
 	if error != nil {
@@ -80,7 +63,7 @@ func (idb *InDB) ExamHandler(c *gin.Context) {
 	tn := time.Now()
 	if exam.FinishDate.Before(tn) {
 		c.JSON(http.StatusUnauthorized, gin.H{
-			"message": "Try out selesai",
+			"message": "Waktu try out habis",
 			"status":  true,
 		})
 		return
@@ -90,7 +73,7 @@ func (idb *InDB) ExamHandler(c *gin.Context) {
 	 * Tampilan soal sebanyak 5
 	 */
 	dataQuest := []models.Question{}
-	error = idb.DB.Limit(limit).Where("test_id = ?", testId).Find(&dataQuest).Error
+	error = idb.DB.Limit(limit).Offset(offset).Where("test_id = ?", testId).Find(&dataQuest).Error
 	if error != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": error.Error(),
@@ -100,7 +83,7 @@ func (idb *InDB) ExamHandler(c *gin.Context) {
 		return
 	}
 
-	choice := models.Choice{}
+	choice := []models.Choice{}
 	// qc := models.QuestionChoice{}
 	dataList := []models.QuestionChoice{}
 	for _, element := range dataQuest {
@@ -118,5 +101,177 @@ func (idb *InDB) ExamHandler(c *gin.Context) {
 		"message": "successfully",
 		"status":  true,
 		"data":    dataList,
+	})
+}
+
+func (idb *InDB) AnswerHandler(c *gin.Context) {
+	var exam models.Exam
+	var answer models.Answer
+
+	testId := c.Param("id")
+	userId, _ := c.Get("UserID")
+
+	error := idb.DB.Where("user_id = ? AND test_id = ? ", userId, testId).First(&exam).Error
+	if error != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": error.Error(),
+			"status":  false,
+			"exam":    false,
+		})
+		return
+	}
+
+	/**
+	 * Cek batas waktu ujian try out
+	 */
+	tn := time.Now()
+	if exam.FinishDate.Before(tn) {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "Waktu try out habis",
+			"status":  true,
+		})
+		return
+	}
+
+	err := c.ShouldBindJSON(&answer)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": err.Error(),
+			"status":  false,
+		})
+		return
+	}
+
+	err = idb.DB.Create(&answer).Error
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": err.Error(),
+			"status":  false,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "insert answer success",
+		"status":  true,
+	})
+}
+
+func (idb *InDB) FinishHandler(c *gin.Context) {
+	var exam models.Exam
+
+	testId := c.Param("id")
+	userId, _ := c.Get("UserID")
+
+	error := idb.DB.Where("user_id = ? AND test_id = ? ", userId, testId).First(&exam).Error
+	if error != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": error.Error(),
+			"status":  false,
+			"exam":    false,
+		})
+		return
+	}
+
+	/**
+	 * Cek batas waktu ujian try out
+	 */
+	tn := time.Now()
+	if exam.FinishDate.Before(tn) {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "Waktu try out habis",
+			"status":  true,
+		})
+		return
+	}
+
+	/**
+	 * Hitung score
+	 */
+	var (
+		correct     = 0
+		wrong       = 0
+		notAnswered = 0
+	)
+	question := models.Question{}
+	listAnswer := []models.Answer{}
+	error = idb.DB.Where("user_id = ? AND test_id = ? ", userId, testId).Find(&listAnswer).Error
+	if error != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": error.Error(),
+			"status":  false,
+			"answer":  false,
+		})
+		return
+	}
+
+	// c.JSON(http.StatusUnauthorized, gin.H{
+	// 	"status": true,
+	// 	"answer": listAnswer,
+	// })
+
+	for _, answer := range listAnswer {
+		_ = idb.DB.Where("question_id = ? ", answer.QuestionId).Find(&question).Error
+		if answer.Response == question.Answer {
+			correct += 1
+		} else if answer.Response != question.Answer {
+			wrong += 1
+		}
+	}
+
+	var count int
+	listQuestion := []models.Question{}
+	_ = idb.DB.Where("test_id = ? ", testId).Find(&listQuestion).Count(&count)
+	notAnswered = count - (correct + wrong)
+	score := (correct * 4) + (wrong * -2)
+	percenCorrect := math.Round(float64(correct)/float64(count)) * 100
+	percenWrong := math.Round(float64(wrong)/float64(count)) * 100
+	duration := time.Since(exam.StartDate)
+
+	newExam := models.Exam{
+		RightAnswer:       correct,
+		WrongAnswer:       wrong,
+		NotAnswered:       notAnswered,
+		Score:             score,
+		PercentageCorrect: percenCorrect,
+		PercentageWrong:   percenWrong,
+		// FinishDate:        time.Now(),
+		Duration: duration.Minutes(),
+		Status:   "completed",
+	}
+
+	error = idb.DB.Model(&exam).Update(newExam).Error
+	if error != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": error.Error(),
+			"status":  false,
+		})
+		return
+	}
+
+	/**
+	 * Get rangking
+	 */
+	listExam := []models.Exam{}
+	error = idb.DB.Where("test_id = ? ", testId).Order("Score desc").Find(&listExam).Error
+	if error != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": error.Error(),
+			"status":  false,
+		})
+		return
+	}
+
+	position := 0
+	for index, ele := range listExam {
+		if userId == ele.UserId {
+			position = int(index) + 1
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":  "succesfully",
+		"status":   true,
+		"position": position,
 	})
 }
