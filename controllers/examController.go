@@ -48,8 +48,12 @@ func (idb *InDB) StartHandler(c *gin.Context) {
 
 func (idb *InDB) ExamHandler(c *gin.Context) {
 	var exam models.Exam
-	testId := c.Param("id")
 
+	testId := c.Param("id")
+	limit, _ := strconv.Atoi(c.Param("limit"))
+	if limit <= 0 {
+		limit = 5
+	}
 	userId, err := c.Get("UserID")
 	if !err {
 		c.JSON(http.StatusUnauthorized, gin.H{
@@ -73,9 +77,34 @@ func (idb *InDB) ExamHandler(c *gin.Context) {
 	 * Cek batas waktu ujian try out
 	 */
 	tn := time.Now()
-	statuUjian := "finised"
-	if exam.FinishDate.After(tn) {
-		statuUjian = "started"
+	if exam.FinishDate.Before(tn) {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "Try out selesai",
+			"status":  true,
+		})
+		return
 	}
 
+	/**
+	 * Tampilan soal sebanyak 5
+	 */
+	dataQuest := []models.Question{}
+	error = idb.DB.Limit(limit).Where("test_id = ?", testId).Find(&dataQuest).Error
+	if error != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": error.Error(),
+			"status":  false,
+		})
+		return
+	}
+
+	choice := models.Choice{}
+	qc := models.QuestionChoice{}
+	dataList := []models.QuestionChoice{}
+	for _, element := range dataQuest {
+		_ = idb.DB.Where("question_id = ? ", element.ID).Find(&choice).Error
+		qc.QuestionId = element.ID
+		qc.Content = element.Content
+		qc.DataChoice = choice
+	}
 }
