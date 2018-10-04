@@ -1,8 +1,9 @@
 package controllers
 
 import (
-	"cekgu/models"
 	"net/http"
+
+	"github.com/ayrokid/cekgu/models"
 
 	"github.com/gin-gonic/gin"
 )
@@ -124,7 +125,7 @@ func (idb *InDB) UpdateTest(c *gin.Context) {
 		response gin.H
 	)
 
-	err := idb.DB.First(&test, id).Error
+	err := idb.DB.Where("id = ? ", id).First(&test).Error
 	if err != nil {
 		response = gin.H{
 			"message": "data not found",
@@ -170,10 +171,10 @@ func (idb *InDB) DeleteTest(c *gin.Context) {
 		response gin.H
 	)
 	id := c.Param("id")
-	err := idb.DB.First(&test, id).Error
+	err := idb.DB.Where("id = ? ", id).First(&test).Error
 	if err != nil {
 		response = gin.H{
-			"message": "data not found",
+			"message": "data test not found",
 			"status":  false,
 		}
 	} else {

@@ -1,10 +1,13 @@
 package main
 
 import (
-	"cekgu/config"
-	"cekgu/controllers"
-	"cekgu/middlewares"
 	"os"
+
+	"cekgu/config"
+
+	"cekgu/controllers"
+
+	"github.com/ayrokid/cekgu/middlewares"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"

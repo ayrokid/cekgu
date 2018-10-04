@@ -1,9 +1,10 @@
 package controllers
 
 import (
-	"cekgu/models"
 	"net/http"
 	"time"
+
+	"github.com/ayrokid/cekgu/models"
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"

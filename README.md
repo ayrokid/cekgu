@@ -1,6 +1,6 @@
 # CEKGU - Restfull API GOLANG with JWT Authentication
 
-Basically this is a starter kit for you to integrate Lumen with [JWT Authentication](https://jwt.io/).
+Basically this is a starter kit for you to integrate with [JWT Authentication](https://jwt.io/).
 
 ## What's Added
 

@@ -1,8 +1,9 @@
 package controllers
 
 import (
-	"cekgu/models"
 	"net/http"
+
+	"github.com/ayrokid/cekgu/models"
 
 	"github.com/gin-gonic/gin"
 )
@@ -90,7 +91,7 @@ func (idb *InDB) UpdateChoice(c *gin.Context) {
 		response gin.H
 	)
 
-	err := idb.DB.First(&choice, id).Error
+	err := idb.DB.Where("id = ? ", id).First(&choice).Error
 	if err != nil {
 		response = gin.H{
 			"message": "data not found",

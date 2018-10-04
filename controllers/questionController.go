@@ -1,8 +1,9 @@
 package controllers
 
 import (
-	"cekgu/models"
 	"net/http"
+
+	"github.com/ayrokid/cekgu/models"
 
 	"github.com/gin-gonic/gin"
 )
@@ -123,7 +124,7 @@ func (idb *InDB) UpdateQuestion(c *gin.Context) {
 		response    gin.H
 	)
 
-	err := idb.DB.First(&question, id).Error
+	err := idb.DB.Where("id = ? ", id).First(&question).Error
 	if err != nil {
 		response = gin.H{
 			"message": "data not found",
@@ -169,7 +170,7 @@ func (idb *InDB) DeleteQuestion(c *gin.Context) {
 		response gin.H
 	)
 	id := c.Param("id")
-	err := idb.DB.First(&question, id).Error
+	err := idb.DB.Where("id = ? ", id).First(&question).Error
 	if err != nil {
 		response = gin.H{
 			"message": "data not found",

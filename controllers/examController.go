@@ -1,11 +1,12 @@
 package controllers
 
 import (
-	"cekgu/models"
 	"math"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/ayrokid/cekgu/models"
 
 	"github.com/gin-gonic/gin"
 )
