@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/ayrokid/cekgu/models"
 
@@ -85,7 +86,7 @@ func (idb *InDB) UpdateChoice(c *gin.Context) {
 		})
 		return
 	}
-	id := c.Query("id")
+	id, _ := strconv.Atoi(c.Param("id"))
 	var (
 		choice   models.Choice
 		response gin.H

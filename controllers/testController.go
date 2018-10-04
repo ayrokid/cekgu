@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/ayrokid/cekgu/models"
 
@@ -118,7 +119,7 @@ func (idb *InDB) UpdateTest(c *gin.Context) {
 		})
 		return
 	}
-	id := c.Query("id")
+	id, _ := strconv.Atoi(c.Param("id"))
 	var (
 		test     models.Test
 		newTest  models.Test
@@ -170,7 +171,7 @@ func (idb *InDB) DeleteTest(c *gin.Context) {
 		test     models.Test
 		response gin.H
 	)
-	id := c.Param("id")
+	id, _ := strconv.Atoi(c.Param("id"))
 	err := idb.DB.Where("id = ? ", id).First(&test).Error
 	if err != nil {
 		response = gin.H{

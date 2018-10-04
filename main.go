@@ -3,9 +3,9 @@ package main
 import (
 	"os"
 
-	"cekgu/config"
+	"github.com/ayrokid/cekgu/config"
 
-	"cekgu/controllers"
+	"github.com/ayrokid/cekgu/controllers"
 
 	"github.com/ayrokid/cekgu/middlewares"
 
