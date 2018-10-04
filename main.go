@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/ayrokid/cekgu/config"
+	"cekgu/config"
 
 	"github.com/ayrokid/cekgu/controllers"
 
@@ -50,7 +50,10 @@ func main() {
 		v1.PUT("/question/:id", auth, inDB.UpdateQuestion)
 		v1.DELETE("/question/:id", auth, inDB.DeleteQuestion)
 
-		v1.GET("/choice/:id", inDB.GetChoice)
+		v1.GET("/choice/:q", auth, inDB.GetChoice)
+		v1.POST("/choice/:q", auth, inDB.CreateChoice)
+		v1.PUT("/choice/:q/:id", auth, inDB.UpdateChoice)
+		v1.DELETE("/choice/:q/:id", auth, inDB.DeleteChoice)
 	}
 
 	tryout := router.Group("tryout")
