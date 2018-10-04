@@ -46,18 +46,18 @@ func (idb *InDB) CreateChoice(c *gin.Context) {
 		return
 	}
 	var (
-		choise   models.Choice
+		choice   models.Choice
 		response gin.H
 	)
 
-	err := c.ShouldBindJSON(&choise)
+	err := c.ShouldBindJSON(&choice)
 	if err != nil {
 		response = gin.H{
 			"message": err.Error(),
 			"status":  false,
 		}
 	} else {
-		err = idb.DB.Create(&choise).Error
+		err = idb.DB.Create(&choice).Error
 		if err != nil {
 			response = gin.H{
 				"message": "insert failed",
@@ -86,9 +86,8 @@ func (idb *InDB) UpdateChoice(c *gin.Context) {
 	}
 	id := c.Query("id")
 	var (
-		choice    models.Choice
-		newChoice models.Choice
-		response  gin.H
+		choice   models.Choice
+		response gin.H
 	)
 
 	err := idb.DB.First(&choice, id).Error
@@ -107,7 +106,9 @@ func (idb *InDB) UpdateChoice(c *gin.Context) {
 		}
 	}
 
-	err = idb.DB.Model(&choice).Update(newChoice).Error
+	_ = idb.DB.Where("question_id = ? ", id).Delete(&choice).Error
+
+	err = idb.DB.Create(&choice).Error
 	if err != nil {
 		response = gin.H{
 			"message": err.Error(),
