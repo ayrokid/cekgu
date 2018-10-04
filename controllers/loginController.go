@@ -59,6 +59,5 @@ func (idb *InDB) LoginHandler(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"token": token,
-		"user":  student,
 	})
 }

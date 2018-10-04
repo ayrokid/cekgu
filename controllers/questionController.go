@@ -8,6 +8,14 @@ import (
 )
 
 func (idb *InDB) GetQuestion(c *gin.Context) {
+	role, _ := c.Get("Role")
+	if role != "admin" {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "access not allow",
+			"status":  false,
+		})
+		return
+	}
 	var question models.Question
 	var response gin.H
 	id := c.Param("id")
@@ -29,6 +37,14 @@ func (idb *InDB) GetQuestion(c *gin.Context) {
 }
 
 func (idb *InDB) AllQuestion(c *gin.Context) {
+	role, _ := c.Get("Role")
+	if role != "admin" {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "access not allow",
+			"status":  false,
+		})
+		return
+	}
 	var (
 		questions []models.Question
 		response  gin.H
@@ -53,6 +69,14 @@ func (idb *InDB) AllQuestion(c *gin.Context) {
 }
 
 func (idb *InDB) CreateQuestion(c *gin.Context) {
+	role, _ := c.Get("Role")
+	if role != "admin" {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "access not allow",
+			"status":  false,
+		})
+		return
+	}
 	var (
 		question models.Question
 		response gin.H
@@ -84,6 +108,14 @@ func (idb *InDB) CreateQuestion(c *gin.Context) {
 }
 
 func (idb *InDB) UpdateQuestion(c *gin.Context) {
+	role, _ := c.Get("Role")
+	if role != "admin" {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "access not allow",
+			"status":  false,
+		})
+		return
+	}
 	id := c.Query("id")
 	var (
 		question    models.Question
@@ -124,6 +156,14 @@ func (idb *InDB) UpdateQuestion(c *gin.Context) {
 }
 
 func (idb *InDB) DeleteQuestion(c *gin.Context) {
+	role, _ := c.Get("Role")
+	if role != "admin" {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "access not allow",
+			"status":  false,
+		})
+		return
+	}
 	var (
 		question models.Question
 		response gin.H

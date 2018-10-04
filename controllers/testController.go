@@ -8,6 +8,14 @@ import (
 )
 
 func (idb *InDB) GetTest(c *gin.Context) {
+	role, _ := c.Get("Role")
+	if role != "admin" {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "access not allow",
+			"status":  false,
+		})
+		return
+	}
 	var test models.Test
 	var response gin.H
 	id := c.Param("id")
@@ -29,6 +37,15 @@ func (idb *InDB) GetTest(c *gin.Context) {
 }
 
 func (idb *InDB) AllTest(c *gin.Context) {
+	role, _ := c.Get("Role")
+	if role != "admin" {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "access not allow",
+			"status":  false,
+		})
+		return
+	}
+
 	var (
 		tests    []models.Test
 		response gin.H
@@ -53,6 +70,14 @@ func (idb *InDB) AllTest(c *gin.Context) {
 }
 
 func (idb *InDB) CreateTest(c *gin.Context) {
+	role, _ := c.Get("Role")
+	if role != "admin" {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "access not allow",
+			"status":  false,
+		})
+		return
+	}
 	var (
 		test     models.Test
 		response gin.H
@@ -84,6 +109,14 @@ func (idb *InDB) CreateTest(c *gin.Context) {
 }
 
 func (idb *InDB) UpdateTest(c *gin.Context) {
+	role, _ := c.Get("Role")
+	if role != "admin" {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "access not allow",
+			"status":  false,
+		})
+		return
+	}
 	id := c.Query("id")
 	var (
 		test     models.Test
@@ -124,6 +157,14 @@ func (idb *InDB) UpdateTest(c *gin.Context) {
 }
 
 func (idb *InDB) DeleteTest(c *gin.Context) {
+	role, _ := c.Get("Role")
+	if role != "admin" {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "access not allow",
+			"status":  false,
+		})
+		return
+	}
 	var (
 		test     models.Test
 		response gin.H

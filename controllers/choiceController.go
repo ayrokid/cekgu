@@ -8,6 +8,14 @@ import (
 )
 
 func (idb *InDB) GetChoice(c *gin.Context) {
+	role, _ := c.Get("Role")
+	if role != "admin" {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "access not allow",
+			"status":  false,
+		})
+		return
+	}
 	var choice models.Choice
 	var response gin.H
 	id := c.Param("id")
@@ -29,6 +37,14 @@ func (idb *InDB) GetChoice(c *gin.Context) {
 }
 
 func (idb *InDB) CreateChoice(c *gin.Context) {
+	role, _ := c.Get("Role")
+	if role != "admin" {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "access not allow",
+			"status":  false,
+		})
+		return
+	}
 	var (
 		choise   models.Choice
 		response gin.H
@@ -60,6 +76,14 @@ func (idb *InDB) CreateChoice(c *gin.Context) {
 }
 
 func (idb *InDB) UpdateChoice(c *gin.Context) {
+	role, _ := c.Get("Role")
+	if role != "admin" {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "access not allow",
+			"status":  false,
+		})
+		return
+	}
 	id := c.Query("id")
 	var (
 		choice    models.Choice
