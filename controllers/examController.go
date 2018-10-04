@@ -109,7 +109,7 @@ func (idb *InDB) AnswerHandler(c *gin.Context) {
 	var exam models.Exam
 	var answer models.Answer
 
-	testId := c.Param("id")
+	testId, _ := strconv.Atoi(c.Param("id"))
 	userId, _ := c.Get("UserID")
 
 	error := idb.DB.Where("user_id = ? AND test_id = ? ", userId, testId).Select("finish_date").First(&exam).Error
@@ -138,6 +138,15 @@ func (idb *InDB) AnswerHandler(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": err.Error(),
+			"status":  false,
+		})
+		return
+	}
+
+	err = idb.DB.Where("user_id = ? AND test_id = ? AND question_id = ? ", userId, testId, answer.QuestionId).FirstOrCreate(&answer).Error
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "pertanyaan telah dijawab",
 			"status":  false,
 		})
 		return
