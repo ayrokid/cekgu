@@ -11,6 +11,12 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+func (idb *InDB) HelloHandler(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Try out @Cekgu",
+	})
+}
+
 func (idb *InDB) LoginHandler(c *gin.Context) {
 	var (
 		user    models.User

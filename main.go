@@ -35,6 +35,7 @@ func main() {
 	auth := middlewares.Auth
 	router := gin.Default()
 
+	router.GET("/", inDB.HelloHandler)
 	router.POST("/login", inDB.LoginHandler)
 	v1 := router.Group("v1")
 	{
